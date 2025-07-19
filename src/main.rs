@@ -23,17 +23,6 @@ async fn main() -> Result<()> {
         Commands::Init { path } => {
             commands::init::execute(&path).await?;
         }
-        Commands::New {
-            r#type,
-            title,
-            fields,
-            body,
-        } => {
-            commands::new::execute(&r#type, title.as_deref(), &fields, body.as_deref()).await?;
-        }
-        Commands::Grow { uuid, content } => {
-            commands::grow::execute(&uuid, &content).await?;
-        }
         Commands::Get { uuid, format } => {
             commands::get::execute(&uuid, &format).await?;
         }

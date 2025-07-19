@@ -26,8 +26,8 @@ Based on the codebase analysis, here's how we'll implement the unified 'write' c
 - [x] In write.rs, reuse logic from grow.rs for content appending when UUID is provided
 - [x] Add validation to ensure type is provided when creating new artifacts (UUID is None)
 - [x] Update CLI match statement in src/cli.rs to handle Write command execution
-- [ ] Remove New and Grow command variants from CLI enum and their execute matches
-- [ ] Delete src/commands/new.rs and src/commands/grow.rs files
+- [x] Remove New and Grow command variants from CLI enum and their execute matches
+- [x] Delete src/commands/new.rs and src/commands/grow.rs files
 - [ ] Update docs/usage.md to document the new write command and remove new/grow documentation
 - [ ] Update docs/plugin.md if it references the old commands
 - [ ] Update CLAUDE.md to reflect the new write command examples

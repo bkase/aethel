@@ -16,35 +16,6 @@ pub enum Commands {
         path: String,
     },
 
-    /// Create a new artifact
-    New {
-        /// Type of artifact to create
-        #[arg(long, short = 't')]
-        r#type: String,
-
-        /// Title for the artifact
-        #[arg(long)]
-        title: Option<String>,
-
-        /// Additional fields as key=value pairs
-        #[arg(long = "field", short = 'f', value_parser = parse_key_val)]
-        fields: Vec<(String, String)>,
-
-        /// Body content for the artifact
-        #[arg(long)]
-        body: Option<String>,
-    },
-
-    /// Append content to an existing artifact
-    Grow {
-        /// UUID of the artifact
-        #[arg(long)]
-        uuid: String,
-
-        /// Content to append
-        #[arg(long)]
-        content: String,
-    },
 
     /// Retrieve an artifact
     Get {
