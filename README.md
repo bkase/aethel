@@ -66,6 +66,9 @@ aethel_vault/
     └── registry.cache # Plugin cache
 ```
 
-## Development
+## Documentation
 
-See [docs/sdd.md](docs/sdd.md) for detailed technical design and [docs/prd.md](docs/prd.md) for product requirements.
+- **[Usage Guide](docs/usage.md)** - Comprehensive CLI reference and workflows
+- **[Plugin Development](docs/plugin.md)** - Guide for creating custom plugins
+- **[System Design](docs/sdd.md)** - Technical architecture details
+- **[Product Requirements](docs/prd.md)** - Product vision and requirements
