@@ -31,8 +31,8 @@ Based on the codebase analysis, here's how we'll implement the unified 'write' c
 - [x] Update docs/usage.md to document the new write command and remove new/grow documentation
 - [x] Update docs/plugin.md if it references the old commands
 - [x] Update CLAUDE.md to reflect the new write command examples
-- [ ] Add tests for write command covering both create and append scenarios
-- [ ] Ensure backward compatibility by maintaining same output format (UUID for create, silent for append)
+- [x] Add tests for write command covering both create and append scenarios
+- [x] Ensure backward compatibility by maintaining same output format (UUID for create, silent for append)
 
 ## Notes
 
