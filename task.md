@@ -28,9 +28,9 @@ Based on the codebase analysis, here's how we'll implement the unified 'write' c
 - [x] Update CLI match statement in src/cli.rs to handle Write command execution
 - [x] Remove New and Grow command variants from CLI enum and their execute matches
 - [x] Delete src/commands/new.rs and src/commands/grow.rs files
-- [ ] Update docs/usage.md to document the new write command and remove new/grow documentation
-- [ ] Update docs/plugin.md if it references the old commands
-- [ ] Update CLAUDE.md to reflect the new write command examples
+- [x] Update docs/usage.md to document the new write command and remove new/grow documentation
+- [x] Update docs/plugin.md if it references the old commands
+- [x] Update CLAUDE.md to reflect the new write command examples
 - [ ] Add tests for write command covering both create and append scenarios
 - [ ] Ensure backward compatibility by maintaining same output format (UUID for create, silent for append)
 

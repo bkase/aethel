@@ -48,14 +48,11 @@ cargo clippy
 ### CLI Usage Examples
 
 ```bash
-# Create a new artifact with initial content
-cargo run -- new --type note --title "My Note" --body "Initial content here"
-
-# Create empty artifact (backward compatible)
-cargo run -- new --type note --title "Empty Note"
+# Create a new artifact
+cargo run -- write --type note --title "My Note" --content "Initial content here"
 
 # Append to existing artifact
-cargo run -- grow --uuid <UUID> --content "Additional content"
+cargo run -- write --uuid <UUID> --content "Additional content"
 ```
 
 ## Key Design Principles

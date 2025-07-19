@@ -392,8 +392,9 @@ fields:
 
 ```bash title=test_plugin.sh
 # Create test artifact (fields are not validated)
-aethel new --type {{plugin_id}}/{{schema_name}} \
+aethel write --type {{plugin_id}}/{{schema_name}} \
   --title "Test Artifact" \
+  --content "Test content" \
   --field field1=value1 \
   --field any_field=any_value  # All fields accepted
 
@@ -441,7 +442,7 @@ DISTRIBUTION>>>
    ```
 4. Create your first artifact:
    ```bash
-   aethel new --type {{plugin_id}}/{{schema_name}} --title "My First {{Type}}"
+   aethel write --type {{plugin_id}}/{{schema_name}} --title "My First {{Type}}" --content "Initial content"
    ```
 ```
 
@@ -452,7 +453,7 @@ DISTRIBUTION>>>
 - [ ] At least one schema defined
 - [ ] All required fields documented
 - [ ] Examples provided
-- [ ] Tested with aethel new command
+- [ ] Tested with aethel write command
 
 ## Cross-References
 

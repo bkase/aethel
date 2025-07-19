@@ -13,7 +13,7 @@ date: 2025-07-19
 ## Quick Reference
 
 ```
-COMMANDS: init | new | grow | get | doctor
+COMMANDS: init | write | get | doctor
 ARTIFACT_TYPE: plugin_id/schema_name or schema_name
 UUID_FORMAT: 123e4567-e89b-12d3-a456-426614174000
 DEFAULT_PLUGIN: core_note
@@ -151,83 +151,63 @@ Initialized new Aethel vault at: /path/to/vault
 Configuration saved to: ~/.config/aethel/config.json
 ```
 
-### CMD-2: aethel new
+### CMD-2: aethel write
 
-**Syntax:** `aethel new --type <TYPE> [OPTIONS]`
+**Syntax:** `aethel write --content <CONTENT> [OPTIONS]`
 
-**Purpose:** Create new artifact with specified type and metadata.
+**Purpose:** Create new artifact or append to existing one.
 
 **Parameters:**
 | Parameter | Flag | Required | Format | Description |
 |-----------|------|----------|--------|-------------|
-| type | -t, --type | Yes | plugin_id/schema or schema | Artifact type |
-| title | --title | No | string | Artifact title |
+| content | --content | Yes | string | Content to write |
+| uuid | --uuid | No | UUID v4 | Target artifact (if appending) |
+| type | -t, --type | Yes* | plugin_id/schema or schema | Artifact type (*required only for new) |
+| title | --title | No | string | Artifact title (new artifacts only) |
 | field | -f, --field | No | key=value | Custom field (repeatable) |
-| body | --body | No | string | Initial content for the artifact |
 
-**Type Resolution:**
+**Behavior:**
+- If `--uuid` is provided: Appends content to existing artifact
+- If `--uuid` is not provided: Creates new artifact (requires `--type`)
+
+**Type Resolution (for new artifacts):**
 - Full format: `plugin_id/schema_name`
 - Short format: `schema_name` (defaults to core_note plugin)
 
 **Examples:**
-```bash title=new_examples.sh
+```bash title=write_examples.sh
 # Create simple note
-aethel new --type note --title "Meeting Notes"
+aethel write --type note --title "Meeting Notes" \
+  --content "Initial meeting notes content"
 
-# Create note with initial content
-aethel new --type note --title "Quick Thought" \
-  --body "This is my initial idea that I want to capture immediately."
-
-# Create with custom fields
-aethel new --type note --title "Project Ideas" \
+# Create note with custom fields
+aethel write --type note --title "Project Ideas" \
+  --content "## Brainstorming\n\nInitial ideas..." \
   --field priority=high \
   --field category=work
 
-# Create with both body and custom fields
-aethel new --type note --title "Design Document" \
-  --body "## Overview\n\nThis document describes the architecture..." \
-  --field status=draft \
-  --field version=1.0
+# Append to existing artifact
+aethel write --uuid 123e4567-e89b-12d3-a456-426614174000 \
+  --content "Additional thoughts on implementation approach"
 
-# Use custom plugin
-aethel new --type productivity/task \
+# Create with custom plugin
+aethel write --type productivity/task \
   --title "Fix authentication bug" \
+  --content "Investigate OAuth2 token refresh issue" \
   --field status=open \
   --field assignee=alice
 ```
 
-**Output:** UUID of created artifact on stdout (single line).
-
-### CMD-3: aethel grow  
-
-**Syntax:** `aethel grow --uuid <UUID> --content <CONTENT>`
-
-**Purpose:** Append content to existing artifact.
-
-**Parameters:**
-| Parameter | Flag | Required | Format | Description |
-|-----------|------|----------|--------|-------------|
-| uuid | --uuid | Yes | UUID v4 | Target artifact identifier |
-| content | --content | Yes | string | Content to append |
-
-**Behavior:**
-- GROW-1: Appends content after newline
-- GROW-2: Updates `updatedAt` timestamp
-- GROW-3: Preserves existing metadata
-- GROW-4: Creates new Git commit
-
-**Example:**
-```bash title=grow_example.sh  
-aethel grow \
-  --uuid 123e4567-e89b-12d3-a456-426614174000 \
-  --content "Additional thoughts on implementation approach"
-```
+**Output:** 
+- When creating: UUID of created artifact on stdout (single line)
+- When appending: Silent on success
 
 **Common Errors:**
+- Type required when creating new artifacts (no UUID provided)
 - Invalid UUID format
 - Artifact not found with given UUID
 
-### CMD-4: aethel get
+### CMD-3: aethel get
 
 **Syntax:** `aethel get --uuid <UUID> [--format <FORMAT>]`
 
@@ -278,7 +258,7 @@ aethel get --uuid 123e4567-e89b-12d3-a456-426614174000 \
   --format json | jq '.metadata.title'
 ```
 
-### CMD-5: aethel doctor
+### CMD-4: aethel doctor
 
 **Syntax:** `aethel doctor [--fix] [--rebuild-index]`
 
@@ -358,8 +338,8 @@ ARTIFACT_STRUCTURE>>>
 
 | Stage | Command | Description |
 |-------|---------|-------------|
-| Create | `aethel new` | Generate UUID, initialize metadata |
-| Update | `aethel grow` | Append content, update timestamp |
+| Create | `aethel write` | Generate UUID, initialize metadata |
+| Update | `aethel write --uuid` | Append content, update timestamp |
 | Read | `aethel get` | Retrieve by UUID |
 | Delete | Manual removal | Delete file, run doctor |
 
@@ -403,10 +383,10 @@ git -C ~/vault log --name-only --pretty=format: | \
 
 ```bash title=use_default_plugin.sh
 # Short form (implicit core_note)
-aethel new --type note --title "Daily Note"
+aethel write --type note --title "Daily Note" --content "Today's notes"
 
 # Explicit form  
-aethel new --type core_note/note --title "Daily Note"
+aethel write --type core_note/note --title "Daily Note" --content "Today's notes"
 ```
 
 ### Custom Plugin Types
@@ -415,13 +395,14 @@ aethel new --type core_note/note --title "Daily Note"
 
 ```bash title=use_custom_plugins.sh
 # Explicit plugin reference
-aethel new --type productivity/task \
+aethel write --type productivity/task \
   --title "Implement caching" \
+  --content "Add Redis caching layer" \
   --field priority=high \
   --field due_date=2024-02-01
 
 # Short form (if schema name unique)
-aethel new --type task --title "Review PR #123"
+aethel write --type task --title "Review PR #123" --content "Check test coverage"
 ```
 
 ### Schema Discovery
@@ -488,20 +469,16 @@ fields:
 ### WORKFLOW-1: Daily Notes
 
 ```bash title=daily_note_workflow.sh
-# Option A: Create with initial content using --body
-UUID=$(aethel new --type note \
+# Create with initial content
+UUID=$(aethel write --type note \
   --title "Daily Note $(date +%Y-%m-%d)" \
-  --body "## Schedule\n- 09:00 Team standup\n- 14:00 Design review")
-
-# Option B: Create empty and grow throughout day
-UUID=$(aethel new --type note \
-  --title "Daily Note $(date +%Y-%m-%d)")
+  --content "## Schedule\n- 09:00 Team standup\n- 14:00 Design review")
 
 # Append throughout day (silent on success)
-aethel grow --uuid $UUID \
+aethel write --uuid $UUID \
   --content "09:00 - Team standup notes..."
 
-aethel grow --uuid $UUID \
+aethel write --uuid $UUID \
   --content "14:00 - Design review decisions..."
 ```
 
@@ -509,14 +486,15 @@ aethel grow --uuid $UUID \
 
 ```bash title=task_workflow.sh
 # Create task with metadata
-aethel new --type productivity/task \
+aethel write --type productivity/task \
   --title "Implement user authentication" \
+  --content "Initial task description" \
   --field priority=high \
   --field status=open \
   --field assignee=$USER
 
 # Update task progress
-aethel grow --uuid {{TASK_UUID}} \
+aethel write --uuid {{TASK_UUID}} \
   --content "Completed OAuth integration"
 ```
 
@@ -524,16 +502,18 @@ aethel grow --uuid {{TASK_UUID}} \
 
 ```bash title=knowledge_workflow.sh  
 # Create connected notes
-NOTE1=$(aethel new --type note \
+NOTE1=$(aethel write --type note \
   --title "Machine Learning Basics" \
+  --content "Introduction to ML concepts" \
   --field category=ai)
 
-NOTE2=$(aethel new --type note \
+NOTE2=$(aethel write --type note \
   --title "Neural Networks" \
+  --content "Deep learning fundamentals" \
   --field category=ai)
 
 # Link notes via content
-aethel grow --uuid $NOTE2 \
+aethel write --uuid $NOTE2 \
   --content "Builds on concepts from [[$NOTE1]]"
 ```
 
@@ -546,21 +526,7 @@ for file in documents/*.txt; do
   CONTENT=$(cat "$file")
   
   # Create note with content in one step
-  UUID=$(aethel new --type note --title "$TITLE" --body "$CONTENT")
-  
-  echo "Imported: $TITLE ($UUID)"
-done
-
-# Alternative: Create empty then grow (for large files)
-for file in documents/*.txt; do
-  TITLE=$(basename "$file" .txt)
-  CONTENT=$(cat "$file")
-  
-  # Create note and capture UUID
-  UUID=$(aethel new --type note --title "$TITLE")
-  
-  # Add content
-  aethel grow --uuid "$UUID" --content "$CONTENT"
+  UUID=$(aethel write --type note --title "$TITLE" --content "$CONTENT")
   
   echo "Imported: $TITLE ($UUID)"
 done
@@ -585,7 +551,7 @@ done
 aethel doctor
 
 # Enable debug logging
-RUST_LOG=debug aethel new --type note
+RUST_LOG=debug aethel write --type note --title "Test" --content "Test content"
 
 # Verify Git status
 cd ~/vault && git status
@@ -665,16 +631,17 @@ SECURITY>>>
 #!/bin/bash
 # Create timestamped note with content and capture UUID
 
-# Method 1: With initial content
-UUID=$(aethel new \
+# Create with initial content
+UUID=$(aethel write \
   --type note \
   --title "Automated Import $(date +%Y%m%d_%H%M%S)" \
-  --body "Import started at $(date)")
+  --content "Import started at $(date)")
 
-# Method 2: Parse UUID from output (works with or without --body)
-UUID=$(aethel new \
+# Parse UUID from output
+UUID=$(aethel write \
   --type note \
-  --title "Automated Import $(date +%Y%m%d_%H%M%S)" | \
+  --title "Automated Import $(date +%Y%m%d_%H%M%S)" \
+  --content "Initial content" | \
   grep -oE '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}')
 
 if [ -n "$UUID" ]; then
