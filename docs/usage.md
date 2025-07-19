@@ -163,6 +163,7 @@ Configuration saved to: ~/.config/aethel/config.json
 | type | -t, --type | Yes | plugin_id/schema or schema | Artifact type |
 | title | --title | No | string | Artifact title |
 | field | -f, --field | No | key=value | Custom field (repeatable) |
+| body | --body | No | string | Initial content for the artifact |
 
 **Type Resolution:**
 - Full format: `plugin_id/schema_name`
@@ -173,10 +174,20 @@ Configuration saved to: ~/.config/aethel/config.json
 # Create simple note
 aethel new --type note --title "Meeting Notes"
 
+# Create note with initial content
+aethel new --type note --title "Quick Thought" \
+  --body "This is my initial idea that I want to capture immediately."
+
 # Create with custom fields
 aethel new --type note --title "Project Ideas" \
   --field priority=high \
   --field category=work
+
+# Create with both body and custom fields
+aethel new --type note --title "Design Document" \
+  --body "## Overview\n\nThis document describes the architecture..." \
+  --field status=draft \
+  --field version=1.0
 
 # Use custom plugin
 aethel new --type productivity/task \
@@ -477,11 +488,16 @@ fields:
 ### WORKFLOW-1: Daily Notes
 
 ```bash title=daily_note_workflow.sh
-# Step 1: Create dated note (outputs only UUID)
+# Option A: Create with initial content using --body
+UUID=$(aethel new --type note \
+  --title "Daily Note $(date +%Y-%m-%d)" \
+  --body "## Schedule\n- 09:00 Team standup\n- 14:00 Design review")
+
+# Option B: Create empty and grow throughout day
 UUID=$(aethel new --type note \
   --title "Daily Note $(date +%Y-%m-%d)")
 
-# Step 2: Append throughout day (silent on success)
+# Append throughout day (silent on success)
 aethel grow --uuid $UUID \
   --content "09:00 - Team standup notes..."
 
@@ -524,7 +540,18 @@ aethel grow --uuid $NOTE2 \
 ### WORKFLOW-4: Batch Operations
 
 ```bash title=batch_import.sh
-# Import multiple files
+# Import multiple files with content
+for file in documents/*.txt; do
+  TITLE=$(basename "$file" .txt)
+  CONTENT=$(cat "$file")
+  
+  # Create note with content in one step
+  UUID=$(aethel new --type note --title "$TITLE" --body "$CONTENT")
+  
+  echo "Imported: $TITLE ($UUID)"
+done
+
+# Alternative: Create empty then grow (for large files)
 for file in documents/*.txt; do
   TITLE=$(basename "$file" .txt)
   CONTENT=$(cat "$file")
@@ -636,8 +663,15 @@ SECURITY>>>
 
 ```bash title=automation_example.sh
 #!/bin/bash
-# Create timestamped note and capture UUID
+# Create timestamped note with content and capture UUID
 
+# Method 1: With initial content
+UUID=$(aethel new \
+  --type note \
+  --title "Automated Import $(date +%Y%m%d_%H%M%S)" \
+  --body "Import started at $(date)")
+
+# Method 2: Parse UUID from output (works with or without --body)
 UUID=$(aethel new \
   --type note \
   --title "Automated Import $(date +%Y%m%d_%H%M%S)" | \

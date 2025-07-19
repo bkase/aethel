@@ -22,6 +22,8 @@ Add a `--body` argument to the `aethel new` command that allows users to specify
 - [x] Test: Create artifact with --body and verify content is saved
 - [x] Test: Create artifact without --body and verify it still works with empty content
 - [x] Run cargo fmt and cargo clippy to ensure code quality
+- [x] Update docs/usage.md to document the --body argument
+- [x] Update CLAUDE.md to mention the --body argument capability
 
 ## Notes
 
