@@ -21,7 +21,7 @@ Add a `--body` argument to the `aethel new` command that allows users to specify
 - [x] Update artifact creation in `src/commands/new.rs:58-61` to use provided body or empty string
 - [x] Test: Create artifact with --body and verify content is saved
 - [x] Test: Create artifact without --body and verify it still works with empty content
-- [ ] Run cargo fmt and cargo clippy to ensure code quality
+- [x] Run cargo fmt and cargo clippy to ensure code quality
 
 ## Notes
 
