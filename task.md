@@ -1,6 +1,6 @@
 # Add --body argument to new command
 
-**Status:** InProgress
+**Status:** AwaitingCommit
 **Agent PID:** 6967
 
 ## Original Todo
