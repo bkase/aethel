@@ -13,6 +13,7 @@ pub async fn execute(
     artifact_type: &str,
     title: Option<&str>,
     fields: &[(String, String)],
+    body: Option<&str>,
 ) -> Result<()> {
     let config = load_config()?;
     let vault_path = get_vault_path(&config.vault_path)?;
@@ -57,7 +58,7 @@ pub async fn execute(
 
     let artifact = Artifact {
         frontmatter,
-        content: String::new(),
+        content: body.unwrap_or("").to_string(),
     };
 
     // Determine file path

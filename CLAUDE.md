@@ -45,6 +45,19 @@ cargo fmt
 cargo clippy
 ```
 
+### CLI Usage Examples
+
+```bash
+# Create a new artifact with initial content
+cargo run -- new --type note --title "My Note" --body "Initial content here"
+
+# Create empty artifact (backward compatible)
+cargo run -- new --type note --title "Empty Note"
+
+# Append to existing artifact
+cargo run -- grow --uuid <UUID> --content "Additional content"
+```
+
 ## Key Design Principles
 
 1. **Tool-Data Decoupling**: The CLI tool and vault repository are separate
