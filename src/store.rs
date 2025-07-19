@@ -90,7 +90,11 @@ pub fn scan_vault_artifacts(vault_path: &Path) -> Result<Vec<(Uuid, String)>> {
     Ok(artifacts)
 }
 
-pub fn get_plugin_artifact_dir(vault_path: &Path, plugin_id: &str, timestamp: &chrono::DateTime<chrono::Utc>) -> PathBuf {
+pub fn get_plugin_artifact_dir(
+    vault_path: &Path,
+    plugin_id: &str,
+    timestamp: &chrono::DateTime<chrono::Utc>,
+) -> PathBuf {
     vault_path
         .join("20_artifacts")
         .join(plugin_id)
