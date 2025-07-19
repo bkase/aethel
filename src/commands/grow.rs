@@ -33,7 +33,7 @@ pub async fn execute(uuid_str: &str, content: &str) -> Result<()> {
 
     // Write back
     write_artifact(&vault_path, &file_path, &artifact)?;
-    
+
     // Silent on success for better scripting compatibility
     Ok(())
 }

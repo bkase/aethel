@@ -76,9 +76,9 @@ pub async fn execute(
     // Update index
     let pool = create_pool(&vault_path).await?;
     insert_artifact(&pool, &uuid, &relative_path).await?;
-    
+
     // Output only UUID for scripting compatibility
-    println!("{}", uuid);
-    
+    println!("{uuid}");
+
     Ok(())
 }
