@@ -20,12 +20,12 @@ We're building a unified 'write' command that combines the functionality of both
 Based on the codebase analysis, here's how we'll implement the unified 'write' command:
 
 - [x] Add Write command variant to CLI enum in src/cli.rs with optional UUID, type, title, body/content, and fields parameters
-- [ ] Create src/commands/write.rs implementing the unified logic that checks UUID presence to determine create vs append mode
-- [ ] Update src/commands/mod.rs to export the new write module
-- [ ] In write.rs, reuse logic from new.rs for artifact creation when UUID is None
-- [ ] In write.rs, reuse logic from grow.rs for content appending when UUID is provided
-- [ ] Add validation to ensure type is provided when creating new artifacts (UUID is None)
-- [ ] Update CLI match statement in src/cli.rs to handle Write command execution
+- [x] Create src/commands/write.rs implementing the unified logic that checks UUID presence to determine create vs append mode
+- [x] Update src/commands/mod.rs to export the new write module
+- [x] In write.rs, reuse logic from new.rs for artifact creation when UUID is None
+- [x] In write.rs, reuse logic from grow.rs for content appending when UUID is provided
+- [x] Add validation to ensure type is provided when creating new artifacts (UUID is None)
+- [x] Update CLI match statement in src/cli.rs to handle Write command execution
 - [ ] Remove New and Grow command variants from CLI enum and their execute matches
 - [ ] Delete src/commands/new.rs and src/commands/grow.rs files
 - [ ] Update docs/usage.md to document the new write command and remove new/grow documentation

@@ -37,6 +37,22 @@ async fn main() -> Result<()> {
         Commands::Get { uuid, format } => {
             commands::get::execute(&uuid, &format).await?;
         }
+        Commands::Write {
+            uuid,
+            r#type,
+            content,
+            title,
+            fields,
+        } => {
+            commands::write::execute(
+                uuid.as_deref(),
+                r#type.as_deref(),
+                &content,
+                title.as_deref(),
+                &fields,
+            )
+            .await?;
+        }
         Commands::Doctor { fix, rebuild_index } => {
             commands::doctor::execute(fix, rebuild_index).await?;
         }
