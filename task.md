@@ -1,6 +1,6 @@
 # Combine new and grow into one command 'write'
 
-**Status:** InProgress
+**Status:** AwaitingCommit
 **Agent PID:** 45151
 
 ## Original Todo
