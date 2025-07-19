@@ -17,7 +17,7 @@ Add a `--body` argument to the `aethel new` command that allows users to specify
 
 - [x] Add `body: Option<String>` field to the `New` command in `src/cli.rs:31`
 - [x] Update pattern match in `src/main.rs:26-32` to pass body parameter to execute function
-- [ ] Modify `execute()` function signature in `src/commands/new.rs:12-16` to accept `body: Option<&str>`
+- [x] Modify `execute()` function signature in `src/commands/new.rs:12-16` to accept `body: Option<&str>`
 - [ ] Update artifact creation in `src/commands/new.rs:58-61` to use provided body or empty string
 - [ ] Test: Create artifact with --body and verify content is saved
 - [ ] Test: Create artifact without --body and verify it still works with empty content
