@@ -1,7 +1,7 @@
+use crate::error::Result;
 use chrono::{DateTime, Utc};
 use git2::{Repository, Signature};
 use std::path::Path;
-use crate::error::Result;
 
 pub fn get_current_timestamp() -> DateTime<Utc> {
     Utc::now()
@@ -16,6 +16,7 @@ pub fn init_git_repo(path: &Path) -> Result<Repository> {
     Ok(repo)
 }
 
+#[allow(dead_code)]
 pub fn commit_changes(repo: &Repository, message: &str) -> Result<()> {
     let signature = Signature::now("aethel", "aethel@localhost")?;
     let tree_id = {
@@ -24,13 +25,13 @@ pub fn commit_changes(repo: &Repository, message: &str) -> Result<()> {
         index.write()?;
         index.write_tree()?
     };
-    
+
     let tree = repo.find_tree(tree_id)?;
     let parent_commit = match repo.head() {
         Ok(head) => Some(head.peel_to_commit()?),
         Err(_) => None,
     };
-    
+
     let parents = parent_commit.as_ref().into_iter().collect::<Vec<_>>();
     repo.commit(
         Some("HEAD"),
@@ -40,6 +41,6 @@ pub fn commit_changes(repo: &Repository, message: &str) -> Result<()> {
         &tree,
         &parents,
     )?;
-    
+
     Ok(())
 }

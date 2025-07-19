@@ -33,6 +33,7 @@ pub enum AethelError {
     SchemaNotFound(String),
 
     #[error("Invalid artifact type: {0}")]
+    #[allow(dead_code)]
     InvalidArtifactType(String),
 
     #[error("Artifact not found with UUID: {0}")]
