@@ -16,7 +16,6 @@ pub enum Commands {
         path: String,
     },
 
-
     /// Retrieve an artifact
     Get {
         /// UUID of the artifact

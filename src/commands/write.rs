@@ -31,13 +31,10 @@ pub async fn execute(
     }
 }
 
-async fn append_to_artifact(
-    vault_path: &Path,
-    uuid_str: &str,
-    content: &str,
-) -> Result<()> {
+async fn append_to_artifact(vault_path: &Path, uuid_str: &str, content: &str) -> Result<()> {
     // Validate UUID format
-    let uuid = Uuid::parse_str(uuid_str).map_err(|_| AethelError::InvalidUuid(uuid_str.to_string()))?;
+    let uuid =
+        Uuid::parse_str(uuid_str).map_err(|_| AethelError::InvalidUuid(uuid_str.to_string()))?;
 
     // Get artifact file path from index
     let pool = create_pool(vault_path).await?;
@@ -47,19 +44,19 @@ async fn append_to_artifact(
 
     // Read existing artifact
     let mut artifact = read_artifact(vault_path, &file_path)?;
-    
+
     // Append content with proper spacing
     if !artifact.content.is_empty() {
         artifact.content.push_str("\n\n");
     }
     artifact.content.push_str(content);
-    
+
     // Update timestamp
     artifact.frontmatter.updated_at = get_current_timestamp();
-    
+
     // Write back
     write_artifact(vault_path, &file_path, &artifact)?;
-    
+
     Ok(())
 }
 
@@ -80,21 +77,21 @@ async fn create_new_artifact(
 
     // Load registry
     let registry = load_registry(vault_path).await?;
-    
+
     // Parse type and get plugin
     let (plugin_id, _schema_name) = artifact_type
         .split_once('/')
         .unwrap_or(("core_note", artifact_type));
-    
+
     // Verify plugin exists
     if !registry.plugins.contains_key(plugin_id) {
         return Err(AethelError::PluginNotFound(plugin_id.to_string()));
     }
-    
+
     // Create artifact
     let timestamp = get_current_timestamp();
     let uuid = Uuid::new_v4();
-    
+
     let mut extra = HashMap::new();
     if let Some(title) = title {
         extra.insert(
@@ -105,7 +102,7 @@ async fn create_new_artifact(
     for (key, value) in fields {
         extra.insert(key.clone(), serde_yaml::Value::String(value.clone()));
     }
-    
+
     let frontmatter = ArtifactFrontmatter {
         uuid,
         artifact_type: artifact_type.to_string(),
@@ -115,12 +112,12 @@ async fn create_new_artifact(
         schema_version: "1.0".to_string(),
         extra,
     };
-    
+
     let artifact = Artifact {
         frontmatter,
         content: content.to_string(),
     };
-    
+
     // Determine file path
     let filename = format!("{}.md", generate_filename(&timestamp));
     let artifact_dir = get_plugin_artifact_dir(vault_path, plugin_id, &timestamp);
@@ -130,16 +127,16 @@ async fn create_new_artifact(
         .unwrap_or(Path::new(&filename))
         .to_string_lossy()
         .to_string();
-    
+
     // Write artifact
     write_artifact(vault_path, &relative_path, &artifact)?;
-    
+
     // Update index
     let pool = create_pool(vault_path).await?;
     insert_artifact(&pool, &uuid, &relative_path).await?;
-    
+
     // Print UUID for scripting
     println!("{uuid}");
-    
+
     Ok(())
 }
