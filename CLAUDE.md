@@ -83,3 +83,7 @@ When implementing, organize code into these modules:
 3. **Database Schema**: The artifact index includes path, plugin_id, metadata (JSON), and timestamps
 4. **Plugin Discovery**: Plugins are discovered from a `plugins/` directory in the vault
 5. **Synchronization**: Pull before push, handle merge conflicts for the index database
+6. **Artifact Path Format**: Artifacts are stored at `20_artifacts/{plugin_id}/{YYYY}/{MM}/{DDTHH-MM-SSZ}.md`
+   - Example: `20_artifacts/core_note/2025/07/19T14-30-45Z.md`
+   - Year/month directories provide chronological organization
+   - ISO timestamp format for consistent sorting

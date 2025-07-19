@@ -8,7 +8,7 @@ pub fn get_current_timestamp() -> DateTime<Utc> {
 }
 
 pub fn generate_filename(timestamp: &DateTime<Utc>) -> String {
-    timestamp.format("%Y-%m-%d-%H-%M-%S").to_string()
+    timestamp.format("%dT%H-%M-%SZ").to_string()
 }
 
 pub fn init_git_repo(path: &Path) -> Result<Repository> {
