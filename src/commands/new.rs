@@ -58,7 +58,7 @@ pub async fn execute(
 
     let artifact = Artifact {
         frontmatter,
-        content: String::new(),
+        content: body.unwrap_or("").to_string(),
     };
 
     // Determine file path
