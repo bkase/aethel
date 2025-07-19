@@ -29,6 +29,10 @@ pub enum Commands {
         /// Additional fields as key=value pairs
         #[arg(long = "field", short = 'f', value_parser = parse_key_val)]
         fields: Vec<(String, String)>,
+
+        /// Body content for the artifact
+        #[arg(long)]
+        body: Option<String>,
     },
 
     /// Append content to an existing artifact
