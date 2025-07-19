@@ -19,6 +19,19 @@ SCHEMA_INHERITANCE: All schemas inherit base fields
 NAMING_CONVENTION: lowercase_with_underscores
 ```
 
+## Current Implementation Status
+
+**Implemented:**
+- ✅ Plugin discovery and loading
+- ✅ Schema definition and inheritance
+- ✅ Plugin-based artifact organization
+
+**Not Yet Implemented:**
+- ❌ Field validation and type checking
+- ❌ Default value application
+- ❌ Template support
+- ❌ Schema versioning beyond "1.0"
+
 ## Table of Contents
 
 1. [Plugin Architecture](#1-plugin-architecture)
@@ -142,16 +155,18 @@ All schemas automatically inherit these fields:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| uuid | string (UUID v4) | Yes | Unique identifier |
+| uuid | string (UUID v4) | Yes (auto-generated) | Unique identifier |
 | type | string | Yes | Artifact type (plugin_id/schema) |
 | createdAt | string (ISO 8601) | Yes | Creation timestamp |
 | updatedAt | string (ISO 8601) | Yes | Last update timestamp |
 | tags | array[string] | No | Categorization tags |
-| schemaVersion | string | Yes | Schema version (default: "1.0") |
+| schemaVersion | string | Yes (auto-set) | Always "1.0" currently |
 
 ## 4. Field Types
 
 ### Supported Types
+
+**Note:** Field types are currently for documentation purposes only. Type validation is not yet implemented.
 
 | Type | Description | Example Value |
 |------|-------------|---------------|
@@ -165,13 +180,13 @@ All schemas automatically inherit these fields:
 
 ### Field Definition Properties
 
-| Property | Required | Description |
-|----------|----------|-------------|
-| name | Yes | Field identifier (lowercase_underscore) |
-| type | Yes | Data type from supported types |
-| required | Yes | Whether field must be provided |
-| description | No | Human-readable description |
-| default | No | Default value if not provided |
+| Property | Required | Description | Currently Enforced |
+|----------|----------|-------------|-------------------|
+| name | Yes | Field identifier (lowercase_underscore) | ✅ Used for field storage |
+| type | Yes | Data type from supported types | ❌ Stored but not validated |
+| required | Yes | Whether field must be provided | ❌ Stored but not enforced |
+| description | No | Human-readable description | ✅ For documentation |
+| default | No | Default value if not provided | ❌ Stored but not applied |
 
 ## 5. Schema Inheritance
 
@@ -218,45 +233,15 @@ fields:
 ---
 ```
 
-## 6. Templates
+## 6. Templates (Planned Feature)
 
-### Template Purpose
+**Note:** Template support is not yet implemented. This section describes the planned functionality.
 
-Templates provide starting content for new artifacts.
+Templates will provide starting content for new artifacts. The planned implementation includes:
 
-### Template Location
-
-`99_system/plugins/{{PLUGIN_ID}}/templates/{{SCHEMA_NAME}}_template.md`
-
-### Template Format
-
-```markdown title=template_example.md
-# {{title}}
-
-## Overview
-
-{{Write your overview here}}
-
-## Details
-
-{{Add details here}}
-
-## Notes
-
-- Created on {{createdAt}}
-- Last updated: {{updatedAt}}
-```
-
-### Template Variables
-
-Variables available in templates:
-
-| Variable | Description |
-|----------|-------------|
-| `{{field_name}}` | Any field from schema |
-| `{{uuid}}` | Generated UUID |
-| `{{createdAt}}` | Creation timestamp |
-| `{{updatedAt}}` | Update timestamp |
+- Template files in `99_system/plugins/{{PLUGIN_ID}}/templates/`
+- Variable substitution for fields and metadata
+- Automatic template selection based on schema
 
 ## 7. Best Practices
 
@@ -401,18 +386,21 @@ fields:
 - [ ] No circular schema dependencies
 - [ ] Field names follow conventions
 
+**Note:** Field validation and type checking are not currently implemented. All fields passed with `--field` are stored without validation.
+
 ### Testing Commands
 
 ```bash title=test_plugin.sh
-# Create test artifact
+# Create test artifact (fields are not validated)
 aethel new --type {{plugin_id}}/{{schema_name}} \
   --title "Test Artifact" \
-  --field field1=value1
+  --field field1=value1 \
+  --field any_field=any_value  # All fields accepted
 
 # Verify plugin loaded
 aethel doctor
 
-# Check for errors in doctor output
+# Check plugin appears in doctor output
 ```
 
 ### Common Issues
