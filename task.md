@@ -26,8 +26,8 @@ New format: `20_artifacts/{plugin_id}/2025/07/19T14-30-45Z.md`
 - [x] Update documentation in `docs/` to reflect the new artifact path format
 - [x] Update `CLAUDE.md` to document the new path format for future development
 - [x] Run `cargo clippy` and `cargo fmt` to ensure code quality
-- [ ] Test creating a new artifact to verify the new path format works correctly
-- [ ] Test `aethel doctor` command to ensure it still validates the vault structure
+- [x] Test creating a new artifact to verify the new path format works correctly
+- [x] Test `aethel doctor` command to ensure it still validates the vault structure
 
 ## Notes
 
