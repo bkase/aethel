@@ -34,8 +34,6 @@ pub async fn execute(uuid_str: &str, content: &str) -> Result<()> {
     // Write back
     write_artifact(&vault_path, &file_path, &artifact)?;
 
-    println!("Content appended to artifact {uuid}");
-    println!("Updated: {file_path}");
-
+    // Silent on success for better scripting compatibility
     Ok(())
 }

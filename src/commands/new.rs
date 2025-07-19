@@ -77,9 +77,8 @@ pub async fn execute(
     let pool = create_pool(&vault_path).await?;
     insert_artifact(&pool, &uuid, &relative_path).await?;
 
-    println!("Created new {artifact_type} artifact:");
-    println!("  UUID: {uuid}");
-    println!("  Path: {relative_path}");
+    // Output only UUID for scripting compatibility
+    println!("{uuid}");
 
     Ok(())
 }

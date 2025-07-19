@@ -15,6 +15,11 @@ pub fn get_config_path() -> Result<PathBuf> {
 }
 
 pub fn load_config() -> Result<Config> {
+    // Check for AETHEL_VAULT environment variable first
+    if let Ok(vault_path) = std::env::var("AETHEL_VAULT") {
+        return Ok(Config { vault_path });
+    }
+
     let config_path = get_config_path()?;
 
     if !config_path.exists() {
