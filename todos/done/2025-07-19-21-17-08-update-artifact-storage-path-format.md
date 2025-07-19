@@ -1,6 +1,6 @@
 # Update Artifact Storage Path Format
 
-**Status:** AwaitingCommit
+**Status:** Done
 **Agent PID:** 9319
 
 ## Original Todo
