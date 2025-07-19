@@ -139,7 +139,7 @@ async fn create_new_artifact(
     insert_artifact(&pool, &uuid, &relative_path).await?;
     
     // Print UUID for scripting
-    println!("{}", uuid);
+    println!("{uuid}");
     
     Ok(())
 }
