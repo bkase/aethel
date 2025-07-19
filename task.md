@@ -1,6 +1,6 @@
 # Use makefile and ci
 
-**Status:** Refining
+**Status:** InProgress
 **Agent PID:** 51736
 
 ## Original Todo
@@ -9,16 +9,16 @@ Use a makefile instead and make the GitHub Actions workflow ignore running when 
 
 ## Description
 
-[what we're building]
+Create a Makefile for common development tasks and set up a GitHub Actions CI workflow that ignores documentation changes. This will standardize the build process and ensure CI runs only when code changes are made.
 
 ## Implementation Plan
 
-[how we are building it]
-
-- [ ] Code change with location(s) if applicable (src/file.ts:45-93)
-- [ ] Automated test: ...
-- [ ] User test: ...
+- [ ] Create Makefile with standard Rust targets (Makefile)
+- [ ] Create .github/workflows/ci.yml with paths-ignore configuration (.github/workflows/ci.yml)
+- [ ] Add make targets: build, test, lint (includes fmt check and clippy)
+- [ ] Configure CI to use Makefile targets and cache Cargo dependencies
+- [ ] Verify CI workflow syntax and Makefile functionality
 
 ## Notes
 
-[Implementation notes]
+Based on momentum project's CI setup, implementing paths-ignore for docs and using standard Rust tooling through Make targets.
