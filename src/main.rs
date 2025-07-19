@@ -27,8 +27,9 @@ async fn main() -> Result<()> {
             r#type,
             title,
             fields,
+            body,
         } => {
-            commands::new::execute(&r#type, title.as_deref(), &fields).await?;
+            commands::new::execute(&r#type, title.as_deref(), &fields, body.as_deref()).await?;
         }
         Commands::Grow { uuid, content } => {
             commands::grow::execute(&uuid, &content).await?;
