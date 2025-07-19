@@ -22,7 +22,7 @@ New format: `20_artifacts/{plugin_id}/2025/07/19T14-30-45Z.md`
 - [x] Update `generate_filename()` in `src/utils.rs` to use ISO format `DDTHH-MM-SSZ` instead of `YYYY-MM-DD-HH-MM-SS`
 - [x] Update `get_plugin_artifact_dir()` in `src/store.rs` to return `vault_path/20_artifacts/{plugin_id}/YYYY/MM` with year/month subdirectories
 - [x] Update `new.rs` command to ensure year/month directories are created before writing artifact
-- [ ] Update `scan_vault_artifacts()` in `src/store.rs` to recursively scan the new nested directory structure
+- [x] Update `scan_vault_artifacts()` in `src/store.rs` to recursively scan the new nested directory structure
 - [ ] Update documentation in `docs/` to reflect the new artifact path format
 - [ ] Update `CLAUDE.md` to document the new path format for future development
 - [ ] Run `cargo clippy` and `cargo fmt` to ensure code quality
