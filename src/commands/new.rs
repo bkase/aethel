@@ -63,7 +63,7 @@ pub async fn execute(
 
     // Determine file path
     let filename = format!("{}.md", generate_filename(&timestamp));
-    let artifact_dir = get_plugin_artifact_dir(&vault_path, plugin_id);
+    let artifact_dir = get_plugin_artifact_dir(&vault_path, plugin_id, &timestamp);
     let relative_path = artifact_dir
         .join(&filename)
         .strip_prefix(&vault_path)
