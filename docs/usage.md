@@ -368,7 +368,7 @@ ARTIFACT_STRUCTURE>>>
 **Method 1: File System Browse**
 ```bash title=browse_artifacts.sh
 # List all artifacts for a plugin
-ls -la ~/vault/20_artifacts/core_note/2024/01/
+ls -la ~/vault/20_artifacts/core_note/2025/07/
 ```
 
 **Method 2: Content Search**
@@ -468,12 +468,12 @@ fields:
 ### Artifact Path Format
 
 ```text
-20_artifacts/{{PLUGIN_ID}}/{{YYYY}}/{{MM}}/{{DD}}/{{TYPE}}_{{UUID}}.md
+20_artifacts/{{PLUGIN_ID}}/{{YYYY}}/{{MM}}/{{DDTHH-MM-SSZ}}.md
 ```
 
 **Example Path:**
 ```text
-20_artifacts/core_note/2024-01-20T10-30-00Z_123e4567-e89b-12d3-a456-426614174000.md
+20_artifacts/core_note/2025/07/19T14-30-45Z.md
 ```
 
 ### Storage Rules
