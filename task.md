@@ -19,7 +19,7 @@ We're building a unified 'write' command that combines the functionality of both
 
 Based on the codebase analysis, here's how we'll implement the unified 'write' command:
 
-- [ ] Add Write command variant to CLI enum in src/cli.rs with optional UUID, type, title, body/content, and fields parameters
+- [x] Add Write command variant to CLI enum in src/cli.rs with optional UUID, type, title, body/content, and fields parameters
 - [ ] Create src/commands/write.rs implementing the unified logic that checks UUID presence to determine create vs append mode
 - [ ] Update src/commands/mod.rs to export the new write module
 - [ ] In write.rs, reuse logic from new.rs for artifact creation when UUID is None
