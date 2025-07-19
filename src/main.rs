@@ -16,14 +16,18 @@ use error::Result;
 async fn main() -> Result<()> {
     // Initialize tracing
     tracing_subscriber::fmt::init();
-    
+
     let cli = Cli::parse();
-    
+
     match cli.command {
         Commands::Init { path } => {
             commands::init::execute(&path).await?;
         }
-        Commands::New { r#type, title, fields } => {
+        Commands::New {
+            r#type,
+            title,
+            fields,
+        } => {
             commands::new::execute(&r#type, title.as_deref(), &fields).await?;
         }
         Commands::Grow { uuid, content } => {
@@ -36,6 +40,6 @@ async fn main() -> Result<()> {
             commands::doctor::execute(fix, rebuild_index).await?;
         }
     }
-    
+
     Ok(())
 }

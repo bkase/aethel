@@ -15,50 +15,50 @@ pub enum Commands {
         /// Path to create the vault
         path: String,
     },
-    
+
     /// Create a new artifact
     New {
         /// Type of artifact to create
         #[arg(long, short = 't')]
         r#type: String,
-        
+
         /// Title for the artifact
         #[arg(long)]
         title: Option<String>,
-        
+
         /// Additional fields as key=value pairs
         #[arg(long = "field", short = 'f', value_parser = parse_key_val)]
         fields: Vec<(String, String)>,
     },
-    
+
     /// Append content to an existing artifact
     Grow {
         /// UUID of the artifact
         #[arg(long)]
         uuid: String,
-        
+
         /// Content to append
         #[arg(long)]
         content: String,
     },
-    
+
     /// Retrieve an artifact
     Get {
         /// UUID of the artifact
         #[arg(long)]
         uuid: String,
-        
+
         /// Output format
         #[arg(long, default_value = "markdown")]
         format: OutputFormat,
     },
-    
+
     /// Validate and optionally fix the vault
     Doctor {
         /// Fix issues automatically
         #[arg(long)]
         fix: bool,
-        
+
         /// Rebuild the artifact index
         #[arg(long)]
         rebuild_index: bool,
@@ -74,6 +74,6 @@ pub enum OutputFormat {
 fn parse_key_val(s: &str) -> Result<(String, String), String> {
     let pos = s
         .find('=')
-        .ok_or_else(|| format!("no `=` found in `{}`", s))?;
+        .ok_or_else(|| format!("no `=` found in `{s}`"))?;
     Ok((s[..pos].to_string(), s[pos + 1..].to_string()))
 }
