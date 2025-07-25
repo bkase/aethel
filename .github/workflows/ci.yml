@@ -26,6 +26,11 @@ jobs:
 
       - name: Use project-defined tools with Mise
         run: mise install
+        
+      - name: Install Rust components
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
 
       - name: Check formatting
         run: make fmt
