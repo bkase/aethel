@@ -21,7 +21,7 @@ jobs:
       - name: Setup Mise
         uses: jdx/mise-action@v2
         with:
-          version: latest
+          version: 2025.7.27
           install: true
 
       - name: Use project-defined tools with Mise
