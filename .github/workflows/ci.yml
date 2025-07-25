@@ -19,12 +19,13 @@ jobs:
 
       # Setup Mise (or directly Rustup) for toolchain management
       - name: Setup Mise
-        uses: jdxcode/mise@v1
+        uses: jdx/mise-action@v2
         with:
-          version: 'latest'
+          version: latest
+          install: true
 
       - name: Use project-defined tools with Mise
-        run: mise use --install
+        run: mise install
 
       - name: Check formatting
         run: make fmt
@@ -42,6 +43,9 @@ jobs:
         run: make release
 
       # Optional: Run security audit
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+        
       - name: Run cargo audit
-        run: mise run -- cargo audit --deny warnings || true
+        run: cargo audit --deny warnings || true
         continue-on-error: true
