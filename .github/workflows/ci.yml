@@ -43,6 +43,3 @@ jobs:
 
       - name: Build project (debug)
         run: make build
-
-      - name: Build project (release)
-        run: make release
