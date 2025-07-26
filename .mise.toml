@@ -1,3 +1,6 @@
 [tools]
 rust = "1.88.0"
 
+[env]
+RUSTUP_INIT_SKIP_PATH_CHECK = "yes"
+
