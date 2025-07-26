@@ -157,7 +157,7 @@ fn main() -> Result<()> {
         _ => {
             // All other commands need a vault root
             let vault_root = resolve_vault_root(&cli)?;
-            
+
             match cli.command {
                 Commands::WriteDoc { json, output } => {
                     commands::write::execute(&vault_root, json.as_deref(), output)?;
