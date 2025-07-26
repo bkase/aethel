@@ -35,6 +35,20 @@ pub fn execute(path: Option<PathBuf>) -> Result<()> {
         source: e,
     })?;
 
+    // Create .gitkeep files in each directory
+    let gitkeep_files = vec![
+        docs_dir.join(".gitkeep"),
+        packs_dir.join(".gitkeep"),
+        aethel_dir.join(".gitkeep"),
+    ];
+
+    for gitkeep_path in gitkeep_files {
+        fs::write(&gitkeep_path, "").map_err(|e| AethelCliError::VaultInitFailed {
+            path: gitkeep_path.clone(),
+            source: e,
+        })?;
+    }
+
     println!("Initialized Aethel vault at {}", vault_path.display());
     Ok(())
 }

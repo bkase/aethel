@@ -149,42 +149,52 @@ fn main() -> Result<()> {
         );
     }
 
-    // Resolve vault root
-    let vault_root = match cli.vault_root {
-        Some(path) => path,
-        None => find_vault_root()?,
-    };
-
     // Execute command
-    match cli.command {
+    match &cli.command {
         Commands::Init { path } => {
-            commands::init::execute(path)?;
+            commands::init::execute(path.clone())?;
         }
-        Commands::WriteDoc { json, output } => {
-            commands::write::execute(&vault_root, json.as_deref(), output)?;
-        }
-        Commands::ReadDoc { uuid, output } => {
-            commands::read::execute(&vault_root, uuid, output)?;
-        }
-        Commands::CheckDoc {
-            uuid,
-            autofix,
-            output,
-        } => {
-            commands::check::execute(&vault_root, uuid, autofix, output)?;
-        }
-        Commands::ListPacks { output } => {
-            commands::list::execute(&vault_root, output)?;
-        }
-        Commands::AddPack { source, output } => {
-            commands::add_pack::execute(&vault_root, &source, output)?;
-        }
-        Commands::RemovePack { name, output } => {
-            commands::remove_pack::execute(&vault_root, &name, output)?;
+        _ => {
+            // All other commands need a vault root
+            let vault_root = resolve_vault_root(&cli)?;
+
+            match cli.command {
+                Commands::WriteDoc { json, output } => {
+                    commands::write::execute(&vault_root, json.as_deref(), output)?;
+                }
+                Commands::ReadDoc { uuid, output } => {
+                    commands::read::execute(&vault_root, uuid, output)?;
+                }
+                Commands::CheckDoc {
+                    uuid,
+                    autofix,
+                    output,
+                } => {
+                    commands::check::execute(&vault_root, uuid, autofix, output)?;
+                }
+                Commands::ListPacks { output } => {
+                    commands::list::execute(&vault_root, output)?;
+                }
+                Commands::AddPack { source, output } => {
+                    commands::add_pack::execute(&vault_root, &source, output)?;
+                }
+                Commands::RemovePack { name, output } => {
+                    commands::remove_pack::execute(&vault_root, &name, output)?;
+                }
+                Commands::Init { .. } => unreachable!(),
+            }
         }
     }
 
     Ok(())
+}
+
+/// Resolve vault root from CLI args or find it
+fn resolve_vault_root(cli: &Cli) -> Result<PathBuf> {
+    match &cli.vault_root {
+        Some(path) => Ok(path.clone()),
+        None => find_vault_root(),
+    }
 }
 
 /// Find vault root by looking for docs/ and packs/ directories
