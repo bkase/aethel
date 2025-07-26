@@ -1,0 +1,1 @@
+Initialized Aethel vault at ./my-vault
