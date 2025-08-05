@@ -21,3 +21,8 @@ Thumbs.db
 # Aethel vault files (for testing)
 /test-vault/
 /.aethel/
+
+# Swift build artifacts
+AethelSwift/.build/
+AethelSwift/build/
+AethelSwift/.swiftpm/
