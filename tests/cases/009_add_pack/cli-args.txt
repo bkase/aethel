@@ -1,1 +1,0 @@
-add tests/cases/009_add_pack/pack-to-add --output json

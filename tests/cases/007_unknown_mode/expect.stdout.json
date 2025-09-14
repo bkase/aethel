@@ -1,5 +1,0 @@
-{
-  "code": 40000,
-  "data": null,
-  "message": "Failed to parse JSON input from stdin: unknown variant `invalid_mode`, expected one of `create`, `append`, `merge_frontmatter`, `replace_body` at line 3 column 24"
-}

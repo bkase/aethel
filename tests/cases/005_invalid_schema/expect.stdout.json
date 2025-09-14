@@ -1,9 +1,0 @@
-{
-  "code": 42200,
-  "data": {
-    "expected": null,
-    "got": "\"not a number\"",
-    "pointer": "/energy"
-  },
-  "message": "Error from core library: Schema validation failed: \"not a number\" is not of type \"integer\". Pointer: Some(\"/energy\"), Expected: None, Got: Some(\"\\\"not a number\\\"\")"
-}
