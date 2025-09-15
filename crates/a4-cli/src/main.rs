@@ -154,6 +154,7 @@ fn handle_sync(vault_override: Option<std::path::PathBuf>, args: cli::SyncArgs) 
 
     let mut backend = GixBackend::open(vault.root())?;
 
+    // Stage and commit any local changes
     backend.stage_all()?;
 
     let message = args.message.as_deref().unwrap_or("a4: sync");
@@ -166,6 +167,7 @@ fn handle_sync(vault_override: Option<std::path::PathBuf>, args: cli::SyncArgs) 
     let remote = args.remote.as_deref().unwrap_or("origin");
     let branch = args.branch.as_deref();
 
+    // Fetch latest from remote
     backend.fetch(remote, branch)?;
 
     let remote_ref = if let Some(branch) = branch {
@@ -175,13 +177,45 @@ fn handle_sync(vault_override: Option<std::path::PathBuf>, args: cli::SyncArgs) 
         format!("refs/remotes/{remote}/{current_branch}")
     };
 
+    // Try fast-forward first
     let fast_forwarded = backend.fast_forward_current_branch(&remote_ref)?;
 
     if fast_forwarded {
         tracing::info!("Fast-forwarded to {}", remote_ref);
+    } else if backend.diverged(&remote_ref)? {
+        // We have diverged - try to rebase
+        tracing::info!("Detected divergence, attempting automatic rebase...");
+
+        match backend.rebase_onto(&remote_ref)? {
+            a4_core::git_backend::RebaseResult::Success => {
+                tracing::info!("Successfully rebased onto {}", remote_ref);
+                // Force push after successful rebase
+                backend.push(remote, branch, true)?;
+                tracing::info!("Pushed rebased changes to {}", remote);
+                return Ok(());
+            }
+            a4_core::git_backend::RebaseResult::Conflict => {
+                // There's a conflict - inform the user
+                anyhow::bail!(
+                    "Rebase conflict detected when syncing with {}. \
+                    Please resolve the conflicts manually:\n\
+                    1. Run 'git rebase {}' in the vault directory\n\
+                    2. Resolve any conflicts\n\
+                    3. Run 'git rebase --continue' after resolving\n\
+                    4. Run 'a4 sync' again to push changes",
+                    remote_ref,
+                    remote_ref
+                );
+            }
+            a4_core::git_backend::RebaseResult::NoRebaseNeeded => {
+                // We're already up to date or ahead
+                tracing::info!("No rebase needed");
+            }
+        }
     }
 
-    backend.push(remote, branch)?;
+    // Push changes (normal push, not force)
+    backend.push(remote, branch, false)?;
 
     println!("Sync completed successfully");
 
