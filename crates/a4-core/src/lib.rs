@@ -12,4 +12,5 @@ pub use anchors::AnchorToken;
 pub use append::{append_block, AppendOptions};
 pub use date::{IsoWeek, LocalClock, UtcDay};
 pub use error::A4Error;
+pub use git_backend::{GitBackend, RebaseResult};
 pub use vault::{Vault, VaultOpts, VaultRoot};
