@@ -1,9 +1,0 @@
-{
-  "type": "journal.morning",
-  "mode": "create",
-  "frontmatter": {
-    "energy": "not a number",
-    "mood": "happy"
-  },
-  "body": "This doc has invalid schema."
-}

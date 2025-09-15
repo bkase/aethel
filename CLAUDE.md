@@ -1,96 +1,120 @@
-# CLAUDE.md
+# CLAUDE.md - Aethel A4 Project
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance for Claude Code when working with the Aethel A4 Rust project.
 
 ## Project Overview
 
-Aethel is a document management system with a carefully architected design focusing on minimal, precise specifications. The project follows a strict "no overbuilding" philosophy and is currently in the specification phase with no implementation code yet.
+**Aethel A4** is a Rust-based personal knowledge base system that implements a plain-Markdown, Git-native protocol for managing personal notes and knowledge. The project is designed to be:
 
-## Core Architecture
-
-The system is built around three core primitives:
-- **Doc**: A Markdown file with YAML front-matter, identified by UUID
-- **Pack**: A directory declaring types (schemas), templates, and migrations  
-- **Patch**: A JSON object describing mutations to a Doc
-
-## Implementation Layers
-
-The project follows a strict layered architecture (DO NOT skip layers):
-- **L0 - Core Library**: Pure Rust crate with minimal I/O (POSIX FS only)
-- **L1 - CLI**: Thin binary wrapper over L0 with JSON-first input/output
-- **L2 - Optional Views**: Browse/dump/index capabilities (future)
-- **L3 - Transports & Integrations**: RPC/HTTP servers, SDKs (future)
-
-## Development Commands
-
-Since no implementation exists yet, here are the planned commands based on the Software Design Document:
-
-### Build Commands (planned)
-```bash
-make build          # Build the workspace
-make release        # Build in release mode
-make check          # Check for compilation errors
-make fmt            # Format check
-make fmt-fix        # Auto-format code
-make lint           # Run clippy linting
-make test           # Run all tests
-make clean          # Clean build artifacts
-```
-
-### CLI Commands (planned for L1)
-```bash
-aethel init [PATH]                              # Initialize new vault
-aethel write doc --json - --output json         # Write doc from JSON patch
-aethel read doc <uuid> --output json|md         # Read doc by UUID
-aethel check doc <uuid> --output json           # Validate doc
-aethel list packs --output json                 # List installed packs
-aethel add pack <path> --output json            # Add pack
-aethel remove pack <name> --output json         # Remove pack
-```
+- **App-agnostic**: Uses ordinary `.md` files in standard folders
+- **Daily-first**: Daily notes are the primary capture surface
+- **Low-friction**: Supports append-only operations to known anchors/sections
+- **Git-native**: Uses Git for multi-device synchronization
 
 ## Project Structure
 
+This is a Rust workspace with the following planned structure:
+
 ```
 aethel/
-├── Cargo.toml              # Workspace definition
-├── .mise.toml              # Tool version management
-├── Makefile                # Build automation
-├── docs/
-│   ├── protocol.md         # Core protocol specification
-│   ├── implementation-layers.md # Strict implementation sequence
-│   ├── sdd.md              # Software Design Document
-│   └── golden-tests.md     # Golden test documentation
-└── crates/
-    ├── aethel-core/        # L0: Core library
-    └── aethel-cli/         # L1: CLI binary
+├── crates/
+│   ├── aethel-core/    # Core library (vault resolution, Git sync, etc.)
+│   └── aethel-cli/     # CLI binary built on aethel-core
+├── docs/               # Documentation
+│   ├── protocol.md     # A4 protocol specification
+│   └── sdd.md         # Software design document
+├── Cargo.toml         # Workspace configuration
+├── Makefile           # Build and development commands
+└── rust-toolchain.toml # Rust version pinning (1.88.0)
 ```
 
-## Key Development Principles
+**Note**: The crates directory may not exist yet as this appears to be in early development.
 
-1. **JSON-first**: All input/output must support JSON format
-2. **No overbuilding**: Implement only L0 and L1 initially
-3. **Atomic operations**: All Doc writes use "write to temp, rename" strategy
-4. **Protocol compliance**: All errors map to canonical protocol error codes
-5. **Schema validation**: Strict JSON Schema (Draft 2020-12) validation
+## Development Environment
 
-## Error Handling
+- **Rust Version**: 1.88.0 (pinned in rust-toolchain.toml)
+- **Tool Management**: Uses `mise` for managing Rust and other tools
+- **Components**: rustfmt, clippy (minimal profile)
 
-All errors must map to protocol-defined error codes:
-- 400xx: Bad Request / Malformed input
-- 404xx: Not Found
-- 409xx: Conflict
-- 422xx: Validation errors
-- 500xx: System errors
+## Build and Development Commands
+
+Use the provided Makefile for all common development tasks:
+
+### Primary Commands
+- `make all` - Complete development workflow (build + fmt + lint + test)
+- `make build` - Build the workspace in debug mode
+- `make release` - Build the workspace in release mode
+- `make check` - Check for compilation errors without building binaries
+
+### Code Quality
+- `make fmt` - Check code formatting (fails if unformatted)
+- `make fmt-fix` - Fix code formatting issues
+- `make lint` - Run clippy linter (treats warnings as errors)
+
+### Testing
+- `make test` - Run all tests in the workspace
+- `make nextest` - Run tests with cargo-nextest (if installed, recommended for speed)
+
+### Maintenance
+- `make clean` - Clean build artifacts
+- `make audit` - Run security audit (requires cargo-audit)
+- `make udeps` - Find unused dependencies (requires cargo-udeps)
+
+## Key Dependencies
+
+### Core Functionality
+- **Git Backend**: Will use `gix` (gitoxide) for pure Rust Git operations
+- **Serialization**: serde, serde_json, serde_yaml
+- **CLI**: clap with derive features
+- **Error Handling**: thiserror, anyhow
+
+### Development/Testing
+- **Testing**: rstest, insta (snapshot testing), assert_cmd, predicates
+- **Logging**: tracing, tracing-subscriber
+
+## Planned CLI Interface
+
+The CLI will implement these core commands:
+- `a4 today` - Resolve/create today's note (template or blank)
+- `a4 append` - Append anchored blocks to notes with heading support
+- `a4 sync` - Git-based synchronization (fast-forward only, no complex merges)
+
+## Git Integration Strategy
+
+- **Primary**: Uses `gix` (gitoxide) for pure Rust Git operations
+- **No Subprocesses**: All Git operations through Rust libraries
+- **Sync Strategy**: Fast-forward only for v1 (errors on divergent histories)
+- **Future**: May add libgit2 backend via Cargo features for advanced merge operations
 
 ## Testing Strategy
 
-- **Unit tests**: For each module in `aethel-core`
-- **Conformance tests**: Golden vault fixtures for end-to-end validation
-- **Integration tests**: CLI command testing with JSON I/O verification
+- **Golden Tests**: Uses insta for snapshot testing
+- **CLI Testing**: Uses assert_cmd and predicates for CLI integration tests
+- **Unit Tests**: Standard Rust testing with rstest for parameterized tests
 
-## Important Constraints
+## Important Considerations
 
-- NO network, JSON-RPC, or SQL in L0/L1
-- NO resident processes or sockets in L0/L1  
-- NO hidden state outside `.aethel/` directory
-- Git operations only via CLI subprocess (not library dependencies)
+1. **No Complex Merges**: V1 implements fetch + fast-forward or error approach
+2. **Static Builds**: Preference for pure Rust dependencies to avoid C dependencies
+3. **Cross-Platform**: Targets macOS, Linux, Windows
+4. **Markdown-Centric**: All operations work with plain Markdown files
+5. **Git-Native**: Designed to work seamlessly with Git workflows
+
+## Development Workflow
+
+1. **Setup**: Run `mise install` to get the correct Rust toolchain
+2. **Development**: Use `make all` for complete validation
+3. **Testing**: Use `make nextest` for fast test runs (if available)
+4. **CI**: GitHub Actions runs fmt, lint, test, and build checks
+
+## Documentation
+
+- `docs/protocol.md` - Complete A4 protocol specification
+- `docs/sdd.md` - Software design document with implementation details
+
+## Branch Strategy
+
+- **Main Branch**: `main` - primary development branch
+- **Current Branch**: `a4-version` - current working branch
+
+When working on this project, always run the full `make all` suite before committing to ensure code quality standards are met.

@@ -1,8 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/aethel-core",
-    "crates/aethel-cli",
+    "crates/a4-core",
+    "crates/a4-cli",
 ]
 
 [workspace.package]
@@ -12,33 +12,28 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/aethel/aethel"
 
 [workspace.dependencies]
-# Serialization
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-serde_yaml = "0.9"
-
-# Time and UUID
-uuid = { version = "1.11", features = ["v4", "v7", "serde"] }
-chrono = { version = "0.4", features = ["serde"] }
-semver = { version = "1.0", features = ["serde"] }
-
-# Schema validation
-jsonschema = "0.26"
-
 # Error handling
 thiserror = "2.0"
 anyhow = "1.0"
 
+# Time
+time = { version = "0.3", features = ["local-offset", "formatting", "parsing"] }
+time-tz = { version = "2.0", features = ["system"] }
+
+# Git
+gix = { version = "0.68", default-features = false, features = ["blocking-network-client"] }
+
+# Serialization (for front matter)
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+
+# Regex
+regex = "1.11"
+
 # File operations
 tempfile = "3.14"
-glob = "0.3"
+fs-err = "3.0"
 walkdir = "2.5"
-
-# Static initialization
-once_cell = "1.20"
-
-# Concurrency
-parking_lot = "0.12"
 
 # CLI
 clap = { version = "4.5", features = ["derive", "env"] }
@@ -48,8 +43,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Testing
-rstest = "0.24"
-assert_matches = "1.5"
 insta = { version = "1.41", features = ["json", "yaml"] }
+pretty_assertions = "1.4"
 assert_cmd = "2.0"
 predicates = "3.1"

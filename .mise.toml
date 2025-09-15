@@ -1,5 +1,5 @@
 [tools]
-rust = "1.88.0"
+rust = "latest"
 
 [env]
 RUSTUP_INIT_SKIP_PATH_CHECK = "yes"

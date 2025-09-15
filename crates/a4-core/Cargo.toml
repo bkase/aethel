@@ -1,0 +1,23 @@
+[package]
+name = "a4-core"
+version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+thiserror = { workspace = true }
+regex = { workspace = true }
+time = { workspace = true }
+time-tz = { workspace = true }
+gix = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+fs-err = { workspace = true }
+walkdir = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+insta = { workspace = true }
+pretty_assertions = { workspace = true }

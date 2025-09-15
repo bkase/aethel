@@ -1,9 +1,0 @@
-{
-  "type": "journal.morning",
-  "mode": "invalid_mode",
-  "frontmatter": {
-    "energy": 3,
-    "mood": "happy"
-  },
-  "body": "This has an invalid mode."
-}
