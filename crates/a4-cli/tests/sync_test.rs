@@ -7,7 +7,7 @@ fn init_test_repo(dir: &Path) -> Result<(), Box<dyn std::error::Error>> {
     std::process::Command::new("git")
         .arg("init")
         .arg("-b")
-        .arg("main")  // Explicitly set the default branch name
+        .arg("main") // Explicitly set the default branch name
         .current_dir(dir)
         .output()?;
 
