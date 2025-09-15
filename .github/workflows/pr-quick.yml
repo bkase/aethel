@@ -1,0 +1,50 @@
+name: PR Quick Check
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Quick unified check using make all
+  quick-check:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    name: Quick Check - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Setup toolchains
+      - name: Setup Mise
+        uses: jdx/mise-action@v2
+        with:
+          version: 2025.7.27
+          install: true
+
+      - name: Use project-defined tools with Mise
+        run: mise install
+
+      - name: Install Rust components
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
+
+      # Skip Swift on Linux
+      - name: Run all checks (Rust only on Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          make build-rust
+          make fmt-rust
+          make lint-rust
+          make test-rust
+
+      # Run both Rust and Swift on macOS
+      - name: Run all checks (Rust + Swift on macOS)
+        if: matrix.os == 'macos-latest'
+        run: make all

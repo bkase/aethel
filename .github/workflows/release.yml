@@ -1,0 +1,163 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  # Build release artifacts for multiple platforms
+  build-release:
+    strategy:
+      matrix:
+        include:
+          # Rust targets
+          - name: Rust Linux x86_64
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: a4-linux-x86_64
+            build-cmd: cargo build --release --target x86_64-unknown-linux-gnu
+            binary-path: target/x86_64-unknown-linux-gnu/release/a4
+
+          - name: Rust macOS x86_64
+            os: macos-latest
+            target: x86_64-apple-darwin
+            artifact: a4-macos-x86_64
+            build-cmd: cargo build --release --target x86_64-apple-darwin
+            binary-path: target/x86_64-apple-darwin/release/a4
+
+          - name: Rust macOS ARM64
+            os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: a4-macos-arm64
+            build-cmd: cargo build --release --target aarch64-apple-darwin
+            binary-path: target/aarch64-apple-darwin/release/a4
+
+          - name: Rust Windows x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: a4-windows-x86_64
+            build-cmd: cargo build --release --target x86_64-pc-windows-msvc
+            binary-path: target/x86_64-pc-windows-msvc/release/a4.exe
+
+          # Swift builds for Apple platforms
+          - name: Swift macOS Universal
+            os: macos-latest
+            artifact: A4CoreSwift-macos
+            build-cmd: |
+              cd AethelSwift
+              swift build -c release --arch arm64 --arch x86_64
+            binary-path: AethelSwift/.build/apple/Products/Release
+
+          - name: Swift iOS
+            os: macos-latest
+            artifact: A4CoreSwift-ios
+            build-cmd: |
+              cd AethelSwift
+              xcodebuild -scheme A4CoreSwift -sdk iphoneos -configuration Release build ARCHS="arm64" BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+            binary-path: AethelSwift/build/Release-iphoneos
+
+    name: Build - ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Rust toolchain setup
+      - name: Setup Mise
+        if: startsWith(matrix.name, 'Rust')
+        uses: jdx/mise-action@v2
+        with:
+          version: 2025.7.27
+          install: true
+
+      - name: Use project-defined tools with Mise
+        if: startsWith(matrix.name, 'Rust')
+        run: mise install
+
+      - name: Add Rust target
+        if: startsWith(matrix.name, 'Rust')
+        run: rustup target add ${{ matrix.target }}
+
+      # Build the project
+      - name: Build Release
+        run: ${{ matrix.build-cmd }}
+
+      # Package artifacts
+      - name: Package Rust Binary
+        if: startsWith(matrix.name, 'Rust')
+        run: |
+          mkdir -p artifacts
+          cp ${{ matrix.binary-path }} artifacts/
+          cd artifacts
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            7z a ../${{ matrix.artifact }}.zip *
+          else
+            tar czf ../${{ matrix.artifact }}.tar.gz *
+          fi
+
+      - name: Package Swift Framework
+        if: startsWith(matrix.name, 'Swift')
+        run: |
+          mkdir -p artifacts
+          cp -r ${{ matrix.binary-path }} artifacts/
+          cd artifacts
+          tar czf ../${{ matrix.artifact }}.tar.gz *
+
+      # Upload artifacts
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.*
+
+  # Create GitHub release with all artifacts
+  create-release:
+    needs: build-release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: artifacts/**/*
+          body: |
+            # Release ${{ github.ref_name }}
+
+            ## Rust CLI Binaries
+            - Linux x86_64: `a4-linux-x86_64.tar.gz`
+            - macOS x86_64: `a4-macos-x86_64.tar.gz`
+            - macOS ARM64: `a4-macos-arm64.tar.gz`
+            - Windows x86_64: `a4-windows-x86_64.zip`
+
+            ## Swift Frameworks
+            - macOS Universal: `A4CoreSwift-macos.tar.gz`
+            - iOS: `A4CoreSwift-ios.tar.gz`
+
+            ## Installation
+
+            ### Rust CLI
+            ```bash
+            # Download and extract for your platform
+            tar xzf a4-<platform>.tar.gz
+            chmod +x a4
+            sudo mv a4 /usr/local/bin/
+            ```
+
+            ### Swift Package
+            Add to your `Package.swift`:
+            ```swift
+            dependencies: [
+                .package(url: "https://github.com/yourusername/aethel.git", from: "${{ github.ref_name }}")
+            ]
+            ```
