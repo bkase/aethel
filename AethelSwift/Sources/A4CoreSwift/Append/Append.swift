@@ -54,7 +54,7 @@ public enum Append {
         }
 
         let markerLine = opts.anchor.marker()
-        bodyData.append("\(markerLine)\n".data(using: .utf8)!)
+        bodyData.append("\(markerLine)\n\n".data(using: .utf8)!)
 
         bodyData.append(opts.content)
 
