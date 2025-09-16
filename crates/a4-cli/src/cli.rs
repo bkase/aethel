@@ -25,6 +25,9 @@ pub enum Commands {
 
     #[command(about = "Sync vault with remote (fetch, commit, push)")]
     Sync(SyncArgs),
+
+    #[command(about = "Print the resolved vault root path")]
+    Root,
 }
 
 #[derive(Parser)]

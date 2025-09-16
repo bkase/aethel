@@ -18,6 +18,7 @@ fn main() -> Result<()> {
         Commands::Today => handle_today(cli.vault),
         Commands::Append(args) => handle_append(cli.vault, args),
         Commands::Sync(args) => handle_sync(cli.vault, args),
+        Commands::Root => handle_root(cli.vault),
     };
 
     if let Err(e) = result {
@@ -219,5 +220,11 @@ fn handle_sync(vault_override: Option<std::path::PathBuf>, args: cli::SyncArgs) 
 
     println!("Sync completed successfully");
 
+    Ok(())
+}
+
+fn handle_root(vault_override: Option<std::path::PathBuf>) -> Result<()> {
+    let (vault, _) = Vault::resolve_with_override(vault_override)?;
+    println!("{}", vault.root().display());
     Ok(())
 }
