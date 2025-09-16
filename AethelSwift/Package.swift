@@ -2,44 +2,34 @@
 import PackageDescription
 
 let package = Package(
-    name: "AethelSwift",
+    name: "A4Swift",
     platforms: [
         .macOS(.v13),
-        .iOS(.v16)
+        .iOS(.v16),
+        .watchOS(.v9),
+        .tvOS(.v16),
+        .visionOS(.v1)
     ],
     products: [
         .library(
-            name: "AethelCore",
-            targets: ["AethelCore"]
-        ),
-        .executable(
-            name: "aethel",
-            targets: ["AethelCLI"]
+            name: "A4CoreSwift",
+            targets: ["A4CoreSwift"]
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.0"),
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0")
     ],
     targets: [
         .target(
-            name: "AethelCore",
-            dependencies: ["Yams"]
-        ),
-        .executableTarget(
-            name: "AethelCLI",
-            dependencies: [
-                "AethelCore",
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
-            ]
+            name: "A4CoreSwift",
+            dependencies: []
         ),
         .testTarget(
-            name: "AethelCoreTests",
-            dependencies: ["AethelCore"]
+            name: "A4CoreSwiftTests",
+            dependencies: ["A4CoreSwift"]
         ),
         .testTarget(
-            name: "GoldenTests",
-            dependencies: ["AethelCore", "AethelCLI"]
+            name: "A4GoldenParityTests",
+            dependencies: ["A4CoreSwift"]
         )
     ]
 )

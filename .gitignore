@@ -26,3 +26,9 @@ Thumbs.db
 AethelSwift/.build/
 AethelSwift/build/
 AethelSwift/.swiftpm/
+AethelSwift/BuildTools/.build/
+AethelSwift/BuildTools/.swiftpm/
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/

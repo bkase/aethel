@@ -1,4 +1,4 @@
-name: Rust CI
+name: CI
 
 on:
   push:
@@ -12,12 +12,104 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
-    runs-on: ubuntu-latest
+  # Run Rust and Swift checks in parallel using matrix strategy
+  format-and-lint:
+    strategy:
+      matrix:
+        include:
+          - name: Rust
+            os: ubuntu-latest
+            check-fmt: make fmt-rust
+            lint: make lint-rust
+          - name: Swift
+            os: macos-latest
+            check-fmt: make fmt-swift
+            lint: make lint-swift
+
+    name: Format & Lint - ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
 
-      # Setup Mise (or directly Rustup) for toolchain management
+      # Rust toolchain setup
+      - name: Setup Mise (Rust)
+        if: matrix.name == 'Rust'
+        uses: jdx/mise-action@v2
+        with:
+          version: 2025.7.27
+          install: true
+
+      - name: Use project-defined tools with Mise
+        if: matrix.name == 'Rust'
+        run: mise install
+
+      - name: Install Rust components
+        if: matrix.name == 'Rust'
+        run: |
+          rustup component add rustfmt
+          rustup component add clippy
+
+      # Swift toolchain is already available on macOS runners
+
+      - name: Check formatting
+        run: ${{ matrix.check-fmt }}
+
+      - name: Run lints
+        run: ${{ matrix.lint }}
+
+  # Run tests in parallel for both Rust and Swift
+  test:
+    strategy:
+      matrix:
+        include:
+          - name: Rust
+            os: ubuntu-latest
+            build: make build-rust
+            test: make test-rust
+          - name: Swift
+            os: macos-latest
+            build: make build-swift
+            test: make test-swift
+
+    name: Test - ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Rust toolchain setup
+      - name: Setup Mise (Rust)
+        if: matrix.name == 'Rust'
+        uses: jdx/mise-action@v2
+        with:
+          version: 2025.7.27
+          install: true
+
+      - name: Use project-defined tools with Mise
+        if: matrix.name == 'Rust'
+        run: mise install
+
+      # Swift toolchain is already available on macOS runners
+
+      - name: Build project
+        run: ${{ matrix.build }}
+
+      - name: Run tests
+        run: ${{ matrix.test }}
+
+  # Cross-platform Rust tests
+  rust-cross-platform:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    name: Rust Cross-Platform - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Setup Mise
         uses: jdx/mise-action@v2
         with:
@@ -26,20 +118,48 @@ jobs:
 
       - name: Use project-defined tools with Mise
         run: mise install
-        
-      - name: Install Rust components
+
+      - name: Build and test
         run: |
-          rustup component add rustfmt
-          rustup component add clippy
+          cargo build --workspace
+          cargo test --workspace
 
-      - name: Check formatting
-        run: make fmt
+  # Swift cross-platform tests
+  swift-cross-platform:
+    name: Swift Cross-Platform Build
+    runs-on: macos-latest
 
-      - name: Run clippy lints
-        run: make lint
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Run tests
-        run: make test
+      - name: Build Swift Package (macOS)
+        run: |
+          cd AethelSwift
+          swift build
 
-      - name: Build project (debug)
-        run: make build
+      - name: Run Swift Tests
+        run: make test-swift
+
+      - name: Verify iOS platform declaration
+        run: |
+          cd AethelSwift
+          # Verify that Package.swift declares iOS support
+          grep -q "iOS" Package.swift && echo "✅ iOS platform supported in Package.swift" || exit 1
+
+  # Final status check that all required jobs pass
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs: [format-and-lint, test, rust-cross-platform, swift-cross-platform]
+    if: always()
+    steps:
+      - name: Check if all required jobs succeeded
+        run: |
+          if [[ "${{ needs.format-and-lint.result }}" != "success" || \
+                "${{ needs.test.result }}" != "success" || \
+                "${{ needs.rust-cross-platform.result }}" != "success" || \
+                "${{ needs.swift-cross-platform.result }}" != "success" ]]; then
+            echo "One or more required jobs failed"
+            exit 1
+          fi
+          echo "All required jobs succeeded"
